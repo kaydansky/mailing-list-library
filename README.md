@@ -82,4 +82,4 @@ I placed a copy to my test web host where you can try it right now:
 
 MailChimp: [https://ruscoder.com/MailingListLibrary/examples/mailchimp/mailchimp.html](https://ruscoder.com/MailingListLibrary/examples/mailchimp/mailchimp.html)
 
-AWeber: [https://ruscoder.com/MailingListLibrary/examples/aweber/aweber.html](https://ruscoder.com/MailingListLibrary/examples/awebr/aweber.html)
+AWeber: [https://ruscoder.com/MailingListLibrary/examples/aweber/aweber.html](https://ruscoder.com/MailingListLibrary/examples/aweber/aweber.html)
