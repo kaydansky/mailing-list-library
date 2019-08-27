@@ -63,7 +63,7 @@ are allowed to create their custom fields. [Learn more](https://mailchimp.com/he
 $mailChimp->addToList($listId, $emailAddress, ['FNAME' => $firstName, 'LNAME' => $lastName]);
 ```
 So every Provider will require the similar methods differing with the first 
-function name only. E.g Aweber call will be:
+function name only. E.g, AWeber call will be:
 ```php
 $aweber = $factory->aweber();
 $aweber->lists();
@@ -80,4 +80,6 @@ that you can refer for the Library usage in PHP.
 
 I placed a copy to my test web host where you can try it right now:
 
- [https://ruscoder.com/MailingListLibrary/examples/mailchimp/mailchimp.html](https://ruscoder.com/MailingListLibrary/examples/mailchimp/mailchimp.html)
+MailChimp: [https://ruscoder.com/MailingListLibrary/examples/mailchimp/mailchimp.html](https://ruscoder.com/MailingListLibrary/examples/mailchimp/mailchimp.html)
+
+AWeber: [https://ruscoder.com/MailingListLibrary/examples/awebr/aweber.html](https://ruscoder.com/MailingListLibrary/examples/awebr/aweber.html)
