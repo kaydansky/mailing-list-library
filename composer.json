@@ -1,0 +1,24 @@
+{
+  "name": "MailingListLibrary",
+  "type": "library",
+  "description": "Wrapper bundling a number of mailing list providers APIs, in PHP",
+  "minimum-stability": "stable",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "Alexander Kaydansky",
+      "email": "kaydansky@gmail.com"
+    }
+  ],
+  "require": {
+    "php": ">=7.3.0",
+    "drewm/mailchimp-api": "^2.5",
+    "ext-json": "*",
+    "league/oauth2-client": "~2.4.1"
+  },
+  "autoload": {
+    "psr-4": {
+      "MailingListLibrary\\": "src/"
+    }
+  }
+}

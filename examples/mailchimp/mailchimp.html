@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MailChimp Example</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <style>
+        .container-loader {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            padding: 10px;
+            background-color: rgba(0, 0, 0, 0.3);
+            z-index: 1060;
+        }
+        .loader {
+            border: 4px solid #d2d2d2;
+            border-top: 4px solid #283a93;
+            border-radius: 50%;
+            position: fixed;
+            top: 50%;
+            right: 50%;
+            margin-right: -40px;
+            margin-top: -40px;
+            border-radius: 50%;
+            z-index: 1061;
+            width: 40px;
+            height: 40px;
+            animation: spin 2s linear infinite;
+        }
+
+        @-moz-keyframes spin {
+            from { -moz-transform: rotate(0deg); }
+            to { -moz-transform: rotate(360deg); }
+        }
+
+        @-webkit-keyframes spin {
+            from { -webkit-transform: rotate(0deg); }
+            to { -webkit-transform: rotate(360deg); }
+        }
+
+        @keyframes spin {
+            from {transform:rotate(0deg);}
+            to {transform:rotate(360deg);}
+        }
+    </style>
+</head>
+<body>
+<div class="container mb-5 mt-4">
+    <div class="row justify-content-center">
+        <div class="col-12">
+            <div class="card">
+                <h5 class="card-header">MailChimp API Wrapper Example</h5>
+                <div class="card-body">
+                    <p class="text-center">
+                        Use some valid MailChimp's API Key.
+                        To learn how to get it
+                        <a href="https://mailchimp.com/help/about-api-keys/?utm_source=mc-api&utm_medium=docs&utm_campaign=apidocs" target="_blank">click here</a>.
+                    </p>
+                    <form action="" id="apiKeyForm" class="form-inline mb-4">
+                        <label for="apiKey" class="mr-2">Enter your API Key</label>
+                        <input type="text" id="apiKey" placeholder="abc123abc123abc123abc123abc123-us1" class="form-control mr-3 col-4">
+                        <button id="BookCompleted" class="btn btn-primary mr-3">Fetch Lists</button>
+                    </form>
+                    <p id="errorAlert" class="text-center"></p>
+                    <p id="successAlert" class="text-center"></p>
+                    <table id="listsTable" class="table d-none">
+                        <thead>
+                        <th class="text-nowrap">List ID</th>
+                        <th class="text-nowrap">List Name</th>
+                        <th class="text-nowrap">Member Count</th>
+                        <th></th>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container-loader">
+    <div class="loader"></div>
+</div>
+</body>
+<script>
+
+    $('#apiKeyForm').on('submit', function (f) {
+        f.preventDefault();
+        fetchLists();
+    });
+
+    function parseResponse(data) {
+        $('.container-loader').hide();
+        $('#errorAlert').html('');
+        $('#successAlert').html('');
+        var response = $.parseJSON(data);
+
+        if (response.error) {
+            $('#errorAlert').html('<div class="alert alert-danger" role="alert">ERROR: ' + response.error + '</div>');
+            return false;
+        } else {
+            if (response.success) {
+                $('#successAlert').html('<div class="alert alert-success" role="alert">SUCCESS: ' + response.success + '</div>');
+            }
+
+            return response.result;
+        }
+    }
+
+    function fetchLists() {
+        var apiKey = $('#apiKey').val();
+        $('.container-loader').show();
+        $('#listsTable').find("tr:gt(0)").remove();
+
+        $.post('/MailingListLibrary/examples/mailchimp/mailchimp.php', { api_key: apiKey, fetch_lists: 1 }).done(function(data) {
+            var response = parseResponse(data);
+
+            if (! response) {
+                return false;
+            }
+
+            $('#listsTable').removeClass('d-none');
+
+            $.each(response, function(i, item) {
+                $('<tr>').append(
+                    $('<td>').text(item.id),
+                    $('<td>').text(item.name),
+                    $('<td>').text(item.member_count),
+                    $('<td class="text-nowrap">').html(
+                        '<div class="row"><div class="col-3 pr-0">' +
+                        '<input type="text" class="form-control" list-id-email="' + item.id + '" placeholder="Email Address"></div>' +
+                        '<div class="col-3 pr-0">' +
+                        '<input type="text" class="form-control" list-id-fname="' + item.id + '" placeholder="First Name"></div>' +
+                        '<div class="col-3 pr-0">' +
+                        '<input type="text" class="form-control" list-id-lname="' + item.id + '" placeholder="Last Name"></div>' +
+                        '<div class="col-3">' +
+                        '<button class="subscribe btn btn-info" api-key="' + apiKey + '" id="' + item.id + '">Add To List</button></div></div>')
+                ).appendTo('#listsTable');
+            });
+
+            addToList();
+        });
+    }
+
+    function addToList() {
+        $('.subscribe').on('click', function() {
+            var apiKey = $(this).attr('api-key');
+            var listId = $(this).attr('id');
+            var email = $('input[list-id-email="' + listId + '"]').val();
+            var fname = $('input[list-id-fname="' + listId + '"]').val();
+            var lname = $('input[list-id-lname="' + listId + '"]').val();
+
+            if (! email) {
+                alert('Enter Email Address');
+                return false;
+            } else {
+                $('.container-loader').show();
+                $.post('/MailingListLibrary/examples/mailchimp/mailchimp.php',
+                    {
+                        api_key: apiKey,
+                        list_id: listId,
+                        email_address: email,
+                        first_name: fname,
+                        last_name: lname,
+                    }).done(function(data) {
+                    parseResponse(data);
+                });
+            }
+        });
+    }
+</script>
+</html>
