@@ -45,7 +45,7 @@ class ProviderAweber
         $this->expiresToken = $expiresToken;
         $this->client = new Client();
 
-        $scopes = array(
+        $scopes = [
             'account.read',
             'list.read',
             'list.write',
@@ -54,7 +54,7 @@ class ProviderAweber
             'email.read',
             'email.write',
             'subscriber.read-extended'
-        );
+        ];
 
         $this->provider = new GenericProvider([
             'clientId' => $this->clientId,
