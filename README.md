@@ -21,34 +21,53 @@ Include the Library and run the autoloader:
 use MailingListLibrary\MailingListFactory;
 require("vendor/autoload.php");
 ```
-Create an instance of the MailingListFactory providing some valid MailChimp's API Key.
-Use this line for any of providers, just supplying appropriate credentials as arguments.
+Create an instance of the MailingListFactory.
+Use it for any of providers, just supplying appropriate credentials as arguments.
 In particular, MailChimp requires the API Key only, so provide it here:  
 ```php 
 $factory = new MailingListFactory($apiKey);
 ```
-Fire the "lists" request of MailChimp API in order to GET all mailing lists.
-The ```$response``` is an array having whether ```['result']``` key containing successful
-response array as its value or ```['error']``` key with the error description string 
-(same for every function of the Library). The first function "mailChimp()" instructs using 
-the MailChimp's API:
+Create selected provider instance:
 ```php
-$response = $factory->mailChimp()->lists();
+$mailChimp = $factory->mailChimp();
+``` 
+Fire the "lists" request in order to GET all mailing lists:
+```php
+$mailChimp->lists();
 ```
-Fire the "addToList" request of MailChimp API in order to POST new email to the list.
+Get result as the object:
+```php
+$mailChimp->result;
+```
+Or an error message as alternative:
+```php
+$mailChimp->error;
+```
+You may check the response as follows:
+```php
+if ($mailChimp->result) {
+    // Successful response to show:
+    var_dump($mailChimp->result);
+} elseif ($mailChimp->error) {
+    // Error occured:
+    echo $mailChimp->error;
+}
+```
+Fire the "addToList" request in order to POST new email to the list.
 Required arguments are ``$listId`` and ``$emailAddress`` as API request won't work without.
 Optional argument is ``$extraData`` array. Allows to post additional information along with the email.
 Key names must correspond to field names supported by the API. 
 For MailChimp default additional fields are: FNAME, LNAME, ADDRESS, PHONE, BIRTHDAY, also users
 are allowed to create their custom fields. [Learn more](https://mailchimp.com/help/set-default-merge-values/).
 ```php
-$response = $factory->mailChimp()->addToList($listId, $emailAddress, $extraData);
+$mailChimp->addToList($listId, $emailAddress, ['FNAME' => $firstName, 'LNAME' => $lastName]);
 ```
 So every Provider will require the similar methods differing with the first 
 function name only. E.g Aweber call will be:
 ```php
-$response = $factory->aweber()->lists();
-$response = $factory->aweber()->addToList($listId, $emailAddress, $extraData);
+$aweber = $factory->aweber();
+$aweber->lists();
+$aweber->addToList($listUrl, $emailAddress, ['name' => $firstName . ' ' . $lastName]);
 ```
 
 ## Examples
