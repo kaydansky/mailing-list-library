@@ -27,11 +27,27 @@ In particular, MailChimp requires the API Key only, so provide it here:
 ```php 
 $factory = new MailingListFactory($apiKey);
 ```
+You may want to enable several providers at once. Then simply supply all their credentials 
+together:
+```php
+$factory = new MailingListFactory(
+    $MailChimpApiKey, 
+    $AWeberClientId, 
+    $AWeberClientSecret, 
+    $AWeberRedirectUri, 
+    $AWeberOauthAccessToken, 
+    $AWeberOauthRefreshToken, 
+    $AWeberOauthExpiresToken);
+```
 Create selected provider instance:
 ```php
 $mailChimp = $factory->mailChimp();
 ``` 
-Fire the "lists" request in order to GET all mailing lists:
+and/or
+```php
+$aweber = $factory->aweber();
+```
+Fire the "lists" request (say to MailChimp) in order to GET all mailing lists:
 ```php
 $mailChimp->lists();
 ```
@@ -64,11 +80,12 @@ the email (see below).
 $extraData = ['FNAME' => $firstName, 'LNAME' => $lastName];
 $mailChimp->addToList($listId, $emailAddress, $extraData);
 ```
-So every Provider will require the similar methods differing with the first 
-method name only. So AWeber call will be:
+Use same methods for every Provider. So AWeber requests will be:
 ```php
-$aweber = $factory->aweber();
+// Fetch lists
 $aweber->lists();
+
+// Add new subscriber
 $extraData = ['name' => $firstName . ' ' . $lastName];
 $aweber->addToList($listUrl, $emailAddress, $extraData);
 ```
