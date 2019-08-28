@@ -39,7 +39,7 @@ Get result as the object:
 ```php
 $mailChimp->result;
 ```
-Or an error message as alternative:
+Or an error message string as alternative:
 ```php
 $mailChimp->error;
 ```
@@ -53,30 +53,46 @@ if ($mailChimp->result) {
     echo $mailChimp->error;
 }
 ```
+Then parse the ```$mailChimp->result``` array to find out parameters required for further operations,
+e.g, the list ID number (```$listId```) as the ```$mailChimp->result['lists'][$i]['id']```.
+ 
 Fire the "addToList" request in order to POST new email to the list.
 Required arguments are ``$listId`` and ``$emailAddress`` as API request won't work without.
-Optional argument is ``$extraData`` array. Allows to post additional information along with the email.
-Key names must correspond to field names supported by the API. 
-For MailChimp default additional fields are: FNAME, LNAME, ADDRESS, PHONE, BIRTHDAY, also users
-are allowed to create their custom fields. [Learn more](https://mailchimp.com/help/set-default-merge-values/).
+Optional argument is ``$extraData`` array allowing to post the optional data along with 
+the email (see below).
 ```php
-$mailChimp->addToList($listId, $emailAddress, ['FNAME' => $firstName, 'LNAME' => $lastName]);
+$extraData = ['FNAME' => $firstName, 'LNAME' => $lastName];
+$mailChimp->addToList($listId, $emailAddress, $extraData);
 ```
 So every Provider will require the similar methods differing with the first 
-function name only. E.g, AWeber call will be:
+method name only. So AWeber call will be:
 ```php
 $aweber = $factory->aweber();
 $aweber->lists();
-$aweber->addToList($listUrl, $emailAddress, ['name' => $firstName . ' ' . $lastName]);
+$extraData = ['name' => $firstName . ' ' . $lastName];
+$aweber->addToList($listUrl, $emailAddress, $extraData);
 ```
+Unlike MailChimp using the list ID number the AWeber is using the list URL 
+to define the list where subscriber is added to.
+This URL is returned with the ```lists()``` method as ```$aweber->result[$i]['subscribers_collection_link']``` value 
+looking like ```"https://api.aweber.com/1.0/accounts/123/lists/456/subscribers"```.
+
+#### Optional data
+
+The ```$extraData``` argument is an array with optional data (fields) to supply along with new subscriber email 
+address. Every provider has their own field names. In order to comply, your array's key names must correspond to 
+the field names supported by the provider. 
+
+MailChimp default optional fields are: FNAME, LNAME, ADDRESS, PHONE, BIRTHDAY, also users
+are allowed to create their custom fields. [Learn more](https://mailchimp.com/help/set-default-merge-values/).   
+
+AWeber default optional fields are: ad_tracking, custom_fields, ip_address, last_followup_message_number_sent, 
+misc_notes, name, tags. [Learn more](https://api.aweber.com/#tag/Subscribers/paths/~1accounts~1{accountId}~1lists~1{listId}~1subscribers/post).
 
 ## Examples
 
-Example files located in "/examples" directory. Currently example for MailChimp is complete
-and located in "/examples/mailchimp" directory.
-
-Open "mailchimp.html" file in the browser. It is AJAX powered UI using mailchimp.php as back-end 
-that you can refer for the Library usage in PHP.
+Example files located in "/examples" directory. Just open /examples/mailchimp/mailchimp.html or 
+/examples/aweber/aweber.html in your browser.
 
 I placed a copy to my test web host where you can try it right now:
 
