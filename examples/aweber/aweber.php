@@ -29,29 +29,30 @@ $tokenExpiredIn = '';
 $successMessage = '';
 $rows = '';
 
-$factory = new MailingListFactory('', $clientId, $clientSecret, $redirectUri, $oauthAccessToken, $oauthRefreshToken, $oauthExpiresToken);
-$aweber = $factory->aweber();
+$factory = new MailingListFactory('/home3/plastic/public_html/MailingListLibrary/config/config.php');
+$aweber = $factory->aweber($oauthAccessToken, $oauthRefreshToken, $oauthExpiresToken);
 
 if ($aweber->accessToken && $aweber->refreshToken && $aweber->expiresToken) {
     $_SESSION['accessTokenAweber'] = $aweber->accessToken;
     $_SESSION['refreshTokenAweber'] = $aweber->refreshToken;
     $_SESSION['expiresTokenAweber'] = $aweber->expiresToken;
-} else {
+} elseif (! $aweber->error) {
     header('location: aweber.html');
 }
 
-$tokenExpiredIn = ! empty($_SESSION['expiredTokenAweber']) ? $_SESSION['expiredTokenAweber'] : $aweber->expiresToken;
+if (! $aweber->error) {
+    $tokenExpiredIn = ! empty($_SESSION['expiredTokenAweber']) ? $_SESSION['expiredTokenAweber'] : $aweber->expiresToken;
 
-if ($fetchLists) {
-    $aweber->lists();
+    if ($fetchLists) {
+        $aweber->lists();
 
-    if ($aweber->result) {
-        foreach ($aweber->result as $value) {
-            $rows .= '<tr>';
-            $rows .= '<td>' . $value['id'] . '</td>';
-            $rows .= '<td>' . $value['name'] . '</td>';
-            $rows .= '<td>' . (intval($value['total_subscribed_subscribers']) + intval($value['total_unconfirmed_subscribers'])) . '</td>';
-            $rows .= '<td class="text-nowrap"><form method="post" action="/MailingListLibrary/examples/aweber/aweber.php">
+        if ($aweber->result) {
+            foreach ($aweber->result as $value) {
+                $rows .= '<tr>';
+                $rows .= '<td>' . $value['id'] . '</td>';
+                $rows .= '<td>' . $value['name'] . '</td>';
+                $rows .= '<td>' . (intval($value['total_subscribed_subscribers']) + intval($value['total_unconfirmed_subscribers'])) . '</td>';
+                $rows .= '<td class="text-nowrap"><form method="post" action="/MailingListLibrary/examples/aweber/aweber.php">
                         <div class="row"><div class="col-3 pr-0">
                         <input type="hidden" name="list_url" value="' . $value['subscribers_collection_link'] . '">
                         <input type="hidden" name="list_name" value="' . $value['name'] . '">
@@ -62,18 +63,19 @@ if ($fetchLists) {
                         <input type="text" class="form-control" name="last_name" value="" placeholder="Last Name"></div>
                         <div class="col-3">
                         <input type="submit" class="btn btn-info" value="Add To List"></div></div></form></td>';
-            $rows .= '</tr>';
+                $rows .= '</tr>';
+            }
+
+            $successMessage = 'Your Mailing Lists have been fetched';
         }
-
-        $successMessage = 'Your Mailing Lists have been fetched';
     }
-}
 
-if ($listUrl && $emailAddress) {
-    $aweber->addToList($listUrl, $emailAddress, ['name' => $firstName . ' ' . $lastName]);
+    if ($listUrl && $emailAddress) {
+        $aweber->addToList($listUrl, $emailAddress, ['name' => $firstName . ' ' . $lastName]);
 
-    if ($aweber->result) {
-        $successMessage = "Address {$aweber->result['email']} has been added to list {$listName}. Status: {$aweber->result['status']}.";
+        if ($aweber->result) {
+            $successMessage = "Address {$aweber->result['email']} has been added to list {$listName}. Status: {$aweber->result['status']}.";
+        }
     }
 }
 ?>

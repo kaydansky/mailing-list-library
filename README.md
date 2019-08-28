@@ -21,32 +21,16 @@ Include the Library and run the autoloader:
 use MailingListLibrary\MailingListFactory;
 require("vendor/autoload.php");
 ```
-Create an instance of the MailingListFactory.
-Use it for any of providers, just supplying appropriate credentials as arguments.
-In particular, MailChimp requires the API Key only, so provide it here:  
+Create an instance of the MailingListFactory:  
 ```php 
-$factory = new MailingListFactory($apiKey);
+$factory = new MailingListFactory();
 ```
-You may want to enable several providers at once. Then simply supply all their credentials 
-together:
+Create selected provider instance. Supply required credentials as arguments.
+E.g, MailChimp requires the API key:
 ```php
-$factory = new MailingListFactory(
-    $MailChimpApiKey, 
-    $AWeberClientId, 
-    $AWeberClientSecret, 
-    $AWeberRedirectUri, 
-    $AWeberOauthAccessToken, 
-    $AWeberOauthRefreshToken, 
-    $AWeberOauthExpiresToken);
-```
-Create selected provider instance:
-```php
-$mailChimp = $factory->mailChimp();
+$apiKey = 'abc123abc123abc123abc123abc123-us1';
+$mailChimp = $factory->mailChimp($apiKey);
 ``` 
-and/or
-```php
-$aweber = $factory->aweber();
-```
 Fire the "lists" request (say to MailChimp) in order to GET all mailing lists:
 ```php
 $mailChimp->lists();
@@ -80,7 +64,30 @@ the email (see below).
 $extraData = ['FNAME' => $firstName, 'LNAME' => $lastName];
 $mailChimp->addToList($listId, $emailAddress, $extraData);
 ```
-Use same methods for every Provider. So AWeber requests will be:
+AWeber is using OAuth authentication. Therefore their API requires 6 parameters including 
+3 constant: Client ID, Client Secret, Redirect URI and 3 dynamic: Access Token, Refresh Token 
+and Token Expiration Timestamp. 
+
+Create some configuration file to store your constants. For example, ```/config/config.php``` 
+and define constants with your credentials (from your AWeber account):
+```php
+define('AWEBER_CLIENT_ID', 'O9T6kB4BTeNsp2vFTbATrMsNQbYtfXck');
+define('AWEBER_CLIENT_SECRET', '2ur7tArsAGfpURCxBiHp4oZFmMzoJgZH');
+define('AWEBER_REDIRECT_URI', 'https://ruscoder.com/MailingListLibrary/examples/aweber/aweber.php');
+```
+So creating the instance is: 
+```php
+// Supply the real path of your configuration file as argument
+$factory = new MailingListFactory('/your_server_root/path/config/config.php');
+
+// Or get the real path from relative one
+$factory = new MailingListFactory(realpath('../../config/config.php'));
+
+// Supply saved tokens and expiration timestamp if any. Those are opotional arguments, 
+// if empty then user will be redirected to authorization page: 
+$aweber = $factory->aweber($oauthAccessToken, $oauthRefreshToken, $oauthExpiresToken);
+```
+Use same methods for API operations:
 ```php
 // Fetch lists
 $aweber->lists();

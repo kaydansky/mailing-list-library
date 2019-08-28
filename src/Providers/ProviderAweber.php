@@ -15,9 +15,6 @@ use GuzzleHttp\Client;
 class ProviderAweber
 {
     private $provider;
-    private $clientId;
-    private $clientSecret;
-    private $redirectUri;
     private $oauthUrl = 'https://auth.aweber.com/oauth2/';
     private $apiUrl = 'https://api.aweber.com/1.0/';
     private $resourceOwnerDetailsUrl = 'https://api.aweber.com/1.0/accounts';
@@ -30,16 +27,19 @@ class ProviderAweber
     public $result;
     public $error;
 
-    public function __construct($clientId, $clientSecret, $redirectUri, $accessToken = '', $refreshToken = '', $expiresToken = '')
+    /**
+     * ProviderAweber constructor.
+     * @param string $accessToken
+     * @param string $refreshToken
+     * @param string $expiresToken
+     */
+    public function __construct($accessToken = '', $refreshToken = '', $expiresToken = '')
     {
-        if (! $clientId || ! $clientSecret || ! $redirectUri) {
-            $this->error = 'No Client ID nor Client Secret nor Redirect URI supplied';
+        if (! defined('AWEBER_CLIENT_ID') || ! defined('AWEBER_CLIENT_SECRET') || ! defined('AWEBER_REDIRECT_URI')) {
+            $this->error = 'No Client ID nor Client Secret nor Redirect URI supplied. Make sure the config file path is correct.';
             return false;
         }
 
-        $this->clientId = $clientId;
-        $this->clientSecret = $clientSecret;
-        $this->redirectUri = $redirectUri;
         $this->accessToken = $accessToken;
         $this->refreshToken = $refreshToken;
         $this->expiresToken = $expiresToken;
@@ -57,9 +57,9 @@ class ProviderAweber
         ];
 
         $this->provider = new GenericProvider([
-            'clientId' => $this->clientId,
-            'clientSecret' => $this->clientSecret,
-            'redirectUri'=> $this->redirectUri,
+            'clientId' => AWEBER_CLIENT_ID,
+            'clientSecret' => AWEBER_CLIENT_SECRET,
+            'redirectUri'=> AWEBER_REDIRECT_URI,
             'scopes' => $scopes,
             'scopeSeparator' => ' ',
             'urlAuthorize' => $this->oauthUrl . 'authorize',
@@ -77,6 +77,9 @@ class ProviderAweber
         return true;
     }
 
+    /**
+     * Fetch mailing lists
+     */
     public function lists()
     {
         $accounts = $this->getCollection($this->apiUrl . 'accounts');
@@ -84,6 +87,12 @@ class ProviderAweber
         $this->result = $this->getCollection($listsUrl);
     }
 
+    /**
+     * @param $listUrl
+     * @param $emailAddress
+     * @param null $extraData
+     * @return bool
+     */
     public function addToList($listUrl, $emailAddress, $extraData = null)
     {
         $data = array_merge(['email' => $emailAddress], $extraData);
@@ -109,6 +118,10 @@ class ProviderAweber
         return true;
     }
 
+    /**
+     * @param $url
+     * @return array|bool
+     */
     private function getCollection($url) {
         $collection = [];
 
@@ -139,12 +152,14 @@ class ProviderAweber
         return $collection;
     }
 
+    /**
+     * @return bool
+     */
     private function authenticate()
     {
         if (! isset($_GET['code'])) {
             $authorizationUrl = $this->provider->getAuthorizationUrl();
             $_SESSION['oauth2state'] = $this->provider->getState();
-
             header('Location: ' . $authorizationUrl);
             exit;
         } elseif (empty($_GET['state']) || (isset($_SESSION['oauth2state']) && $_GET['state'] !== $_SESSION['oauth2state'])) {
@@ -161,18 +176,21 @@ class ProviderAweber
         return true;
     }
 
+    /**
+     * Check if access token expired and if so then refresh the token
+     */
     private function checkExpiration()
     {
         if (time() > $this->expiresToken) {
-            $this->refresh();
+            $this->getTokens('refresh_token', ['refresh_token' => $this->refreshToken]);
         }
     }
 
-    private function refresh()
-    {
-        $this->getTokens('refresh_token', ['refresh_token' => $this->refreshToken]);
-    }
-
+    /**
+     * @param $grantType
+     * @param array $params
+     * @return bool
+     */
     private function getTokens($grantType, array $params)
     {
         try {
