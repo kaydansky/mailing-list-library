@@ -19,6 +19,7 @@ class ProviderMailChimp
 
     /**
      * ProviderMailChimp constructor.
+     *
      * @param $apiKey
      * @throws Exception
      */
@@ -28,6 +29,8 @@ class ProviderMailChimp
     }
 
     /**
+     * Fetch mailing lists
+     *
      * @return bool
      */
     public function lists()
@@ -36,6 +39,8 @@ class ProviderMailChimp
     }
 
     /**
+     * Add new subscriber to mailing list
+     *
      * @param $listId
      * @param $emailAddress
      * @param null $extraData {array} | Default key names: FNAME, LNAME, ADDRESS, PHONE, BIRTHDAY
@@ -53,6 +58,8 @@ class ProviderMailChimp
     }
 
     /**
+     * Output/Error handler
+     *
      * @param $result
      * @return bool
      */

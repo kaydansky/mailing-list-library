@@ -1,5 +1,7 @@
 <?php
 /**
+ * AWeber API wrapper library example of use
+ *
  * @author: AlexK
  * Date: 20-Aug-19
  * Time: 5:41 PM
@@ -10,10 +12,6 @@ use MailingListLibrary\MailingListFactory;
 require('../../vendor/autoload.php');
 
 session_start();
-
-$clientId = 'O9T6kB4BTeNsp2vFTbATrMsNQbYtfXck';
-$clientSecret = '2ur7tArsAGfpURCxBiHp4oZFmMzoJgZH';
-$redirectUri = 'https://ruscoder.com/MailingListLibrary/examples/aweber/aweber.php';
 
 $fetchLists = filter_input(INPUT_GET, 'fetch_lists', FILTER_SANITIZE_NUMBER_INT);
 $code = filter_input(INPUT_GET, 'code', FILTER_SANITIZE_STRING);
@@ -88,7 +86,6 @@ if (! $aweber->error) {
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous" rel="stylesheet">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 </head>
 <body>
 <div class="container mb-5 mt-4">

@@ -19,10 +19,11 @@ $lastName = filter_input(INPUT_POST, 'last_name', FILTER_SANITIZE_STRING);
 
 if ($apiKey) {
     // Create an instance of the MailingListFactory
-    // Provide some valid MailChimp's API Key
     $factory = new MailingListFactory();
 
+    // The mailChimp instance creation may throw an exception, so catch it if any
     try {
+        // Provide MailChimp's API Key
         $mailChimp = $factory->mailChimp($apiKey);
     } catch (Exception $e) {
         echo json_encode(['error' => $e->getMessage()]);

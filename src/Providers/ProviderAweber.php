@@ -7,10 +7,8 @@
 
 namespace MailingListLibrary\Providers;
 
-use GuzzleHttp\Exception\ClientException;
-use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
-use League\OAuth2\Client\Provider\GenericProvider;
-use GuzzleHttp\Client;
+use League\{OAuth2\Client\Provider\Exception\IdentityProviderException, OAuth2\Client\Provider\GenericProvider};
+use GuzzleHttp\{Exception\ClientException, Client};
 
 class ProviderAweber
 {
@@ -29,6 +27,7 @@ class ProviderAweber
 
     /**
      * ProviderAweber constructor.
+     *
      * @param string $accessToken
      * @param string $refreshToken
      * @param string $expiresToken
@@ -88,9 +87,11 @@ class ProviderAweber
     }
 
     /**
+     * Add new subscriber to mailing list
+     *
      * @param $listUrl
      * @param $emailAddress
-     * @param null $extraData
+     * @param null $extraData {array}
      * @return bool
      */
     public function addToList($listUrl, $emailAddress, $extraData = null)
@@ -119,6 +120,8 @@ class ProviderAweber
     }
 
     /**
+     * Get data collection by URL
+     *
      * @param $url
      * @return array|bool
      */
@@ -153,6 +156,8 @@ class ProviderAweber
     }
 
     /**
+     * OAuth authentication workflow handler
+     *
      * @return bool
      */
     private function authenticate()
@@ -177,7 +182,7 @@ class ProviderAweber
     }
 
     /**
-     * Check if access token expired and if so then refresh the token
+     * Check if access token expired and if so then refresh it
      */
     private function checkExpiration()
     {
@@ -187,6 +192,8 @@ class ProviderAweber
     }
 
     /**
+     * Attempt getting OAuth tokens
+     *
      * @param $grantType
      * @param array $params
      * @return bool

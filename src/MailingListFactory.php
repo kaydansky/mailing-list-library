@@ -10,11 +10,15 @@
 namespace MailingListLibrary;
 
 use Exception;
-use MailingListLibrary\Providers\ProviderAweber;
-use MailingListLibrary\Providers\ProviderMailChimp;
+use MailingListLibrary\{Providers\ProviderAweber, Providers\ProviderMailChimp};
 
 class MailingListFactory
 {
+    /**
+     * MailingListFactory constructor.
+     *
+     * @param string $configPath
+     */
     public function __construct($configPath = '')
     {
         if (file_exists($configPath)) {
@@ -23,6 +27,8 @@ class MailingListFactory
     }
 
     /**
+     * Make MailChimp API wrapper instance
+     *
      * @param $apiKey
      * @return ProviderMailChimp
      * @throws Exception
@@ -33,6 +39,8 @@ class MailingListFactory
     }
 
     /**
+     * Make AWeber API wrapper instance
+     *
      * @param $OAuthAccessToken
      * @param $OAuthRefreshToken
      * @param $OAuthExpiresToken
