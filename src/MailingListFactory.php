@@ -10,7 +10,11 @@
 namespace MailingListLibrary;
 
 use Exception;
-use MailingListLibrary\{Providers\ProviderAweber, Providers\ProviderMailChimp};
+use MailingListLibrary\{
+    Providers\ProviderAweber,
+    Providers\ProviderMailChimp,
+    Providers\ProviderConstantContact
+};
 
 class MailingListFactory
 {
@@ -49,5 +53,17 @@ class MailingListFactory
     public function aweber($OAuthAccessToken, $OAuthRefreshToken, $OAuthExpiresToken): ProviderAweber
     {
         return new ProviderAweber($OAuthAccessToken, $OAuthRefreshToken, $OAuthExpiresToken);
+    }
+
+    /**
+     * Make ConstantContact API wrapper instance
+     *
+     * @param $OAuthAccessToken
+     * @param $OAuthExpiresToken
+     * @return ProviderConstantContact
+     */
+    public function constantContact($OAuthAccessToken, $OAuthExpiresToken): ProviderConstantContact
+    {
+        return new ProviderConstantContact($OAuthAccessToken, $OAuthExpiresToken);
     }
 }

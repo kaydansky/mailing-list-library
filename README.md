@@ -101,6 +101,12 @@ to define the list where subscriber is added to.
 This URL is returned with the ```lists()``` method as ```$aweber->result[$i]['subscribers_collection_link']``` value 
 looking like ```"https://api.aweber.com/1.0/accounts/123/lists/456/subscribers"```.
 
+ConstantContact has OAuth authentication as well. Unlike AWeber they issue the access token for 
+10 years and don't provide the refresh token. I.e. your system should store and pass to 
+ ```$factory->constantContact()``` the access token and token expiration timestamp only 
+ (actually the access token only would be enough as the expiration is 10 years ahead). 
+ Subscriber first and last name field names are particular (see Optional Data below). The rest is same as for AWeber.
+
 #### Optional data
 
 The ```$extraData``` argument is an array with optional data (fields) to supply along with new subscriber email 
@@ -113,6 +119,10 @@ are allowed to create their custom fields. [Learn more](https://mailchimp.com/he
 AWeber default optional fields are: ad_tracking, custom_fields, ip_address, last_followup_message_number_sent, 
 misc_notes, name, tags. [Learn more](https://api.aweber.com/#tag/Subscribers/paths/~1accounts~1{accountId}~1lists~1{listId}~1subscribers/post).
 
+ConstantContact has a lot of optional fieds: 
+[Learn more](https://developer.constantcontact.com/docs/contacts-api/contacts-collection.html?method=POST). 
+For the subscriber name use: ```['first_name' => 'value', 'last_name' => 'value']```.
+
 ## Examples
 
 Example files located in "/examples" directory. Just open /examples/mailchimp/mailchimp.html or 
@@ -123,3 +133,5 @@ I placed a copy to my test web host where you can try it right now:
 MailChimp: [https://ruscoder.com/MailingListLibrary/examples/mailchimp/mailchimp.html](https://ruscoder.com/MailingListLibrary/examples/mailchimp/mailchimp.html)
 
 AWeber: [https://ruscoder.com/MailingListLibrary/examples/aweber/aweber.html](https://ruscoder.com/MailingListLibrary/examples/aweber/aweber.html)
+
+ConstantContact: [https://ruscoder.com/MailingListLibrary/examples/constantcontact/constantcontact.html](https://ruscoder.com/MailingListLibrary/examples/constantcontact/constantcontact.html)

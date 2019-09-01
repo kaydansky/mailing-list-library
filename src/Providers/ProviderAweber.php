@@ -7,12 +7,11 @@
 
 namespace MailingListLibrary\Providers;
 
-use League\{OAuth2\Client\Provider\Exception\IdentityProviderException, OAuth2\Client\Provider\GenericProvider};
 use GuzzleHttp\{Exception\ClientException, Client};
+use MailingListLibrary\OauthHandler;
 
-class ProviderAweber
+class ProviderAweber extends OauthHandler
 {
-    private $provider;
     private $oauthUrl = 'https://auth.aweber.com/oauth2/';
     private $apiUrl = 'https://api.aweber.com/1.0/';
     private $resourceOwnerDetailsUrl = 'https://api.aweber.com/1.0/accounts';
@@ -22,8 +21,8 @@ class ProviderAweber
     public $refreshToken;
     public $expiresToken;
     public $alreadyExpired;
-    public $result;
     public $error;
+    public $result;
 
     /**
      * ProviderAweber constructor.
@@ -42,7 +41,6 @@ class ProviderAweber
         $this->accessToken = $accessToken;
         $this->refreshToken = $refreshToken;
         $this->expiresToken = $expiresToken;
-        $this->client = new Client();
 
         $scopes = [
             'account.read',
@@ -55,23 +53,21 @@ class ProviderAweber
             'subscriber.read-extended'
         ];
 
-        $this->provider = new GenericProvider([
-            'clientId' => AWEBER_CLIENT_ID,
-            'clientSecret' => AWEBER_CLIENT_SECRET,
-            'redirectUri'=> AWEBER_REDIRECT_URI,
-            'scopes' => $scopes,
-            'scopeSeparator' => ' ',
-            'urlAuthorize' => $this->oauthUrl . 'authorize',
-            'urlAccessToken' => $this->oauthUrl . 'token',
-            'urlResourceOwnerDetails' => $this->resourceOwnerDetailsUrl
-        ]);
+        $this->clientId = AWEBER_CLIENT_ID;
+        $this->clientSecret = AWEBER_CLIENT_SECRET;
+        $this->redirectUri = AWEBER_REDIRECT_URI;
+        $this->scopes = $scopes;
+        $this->scopeSeparator = ' ';
+        $this->urlAuthorize = $this->oauthUrl . 'authorize';
+        $this->urlAccessToken = $this->oauthUrl . 'token';
+        $this->urlResourceOwnerDetails = $this->resourceOwnerDetailsUrl;
+        parent::__construct();
 
-        if (! $this->accessToken && ! $this->refreshToken) {
-            $this->authenticate();
+        if ($this->error) {
+            return false;
         }
-        elseif ($this->refreshToken && $this->expiresToken) {
-            $this->checkExpiration();
-        }
+
+        $this->client = new Client();
 
         return true;
     }
@@ -153,63 +149,5 @@ class ProviderAweber
         }
 
         return $collection;
-    }
-
-    /**
-     * OAuth authentication workflow handler
-     *
-     * @return bool
-     */
-    private function authenticate()
-    {
-        if (! isset($_GET['code'])) {
-            $authorizationUrl = $this->provider->getAuthorizationUrl();
-            $_SESSION['oauth2state'] = $this->provider->getState();
-            header('Location: ' . $authorizationUrl);
-            exit;
-        } elseif (empty($_GET['state']) || (isset($_SESSION['oauth2state']) && $_GET['state'] !== $_SESSION['oauth2state'])) {
-            if (isset($_SESSION['oauth2state'])) {
-                unset($_SESSION['oauth2state']);
-            }
-
-            $this->error = 'Invalid state';
-            return false;
-        } else {
-            $this->getTokens('authorization_code', ['code' => $_GET['code']]);
-        }
-
-        return true;
-    }
-
-    /**
-     * Check if access token expired and if so then refresh it
-     */
-    private function checkExpiration()
-    {
-        if (time() > $this->expiresToken) {
-            $this->getTokens('refresh_token', ['refresh_token' => $this->refreshToken]);
-        }
-    }
-
-    /**
-     * Attempt getting OAuth tokens
-     *
-     * @param $grantType
-     * @param array $params
-     * @return bool
-     */
-    private function getTokens($grantType, array $params)
-    {
-        try {
-            $token = $this->provider->getAccessToken($grantType, $params);
-            $this->accessToken = $token->getToken();
-            $this->refreshToken = $token->getRefreshToken();
-            $this->expiresToken = $token->getExpires();
-            $this->alreadyExpired = ($token->hasExpired() ? 'expired' : 'not expired');
-            return true;
-        } catch (IdentityProviderException $e) {
-            $this->error = $e->getMessage();
-            return false;
-        }
     }
 }
