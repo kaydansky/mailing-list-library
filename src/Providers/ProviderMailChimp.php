@@ -43,18 +43,18 @@ class ProviderMailChimp
      *
      * @param $listId
      * @param $emailAddress
-     * @param null $extraData {array} | Default key names: FNAME, LNAME, ADDRESS, PHONE, BIRTHDAY
+     * @param array|null $extraData
      * @return bool
      */
-    public function addToList($listId, $emailAddress, $extraData = null)
+    public function addToList($listId, $emailAddress, array $extraData = null)
     {
-        $array = ['email_address' => $emailAddress, 'status' => 'subscribed'];
+        $data = ['email_address' => $emailAddress, 'status' => 'subscribed'];
 
         if ($extraData && is_array($extraData) && count($extraData)) {
-            $array['merge_fields'] = $extraData;
+            $data['merge_fields'] = $extraData;
         }
 
-        return $this->output($this->class->post("lists/$listId/members", $array));
+        return $this->output($this->class->post("lists/$listId/members", $data));
     }
 
     /**

@@ -68,7 +68,6 @@ class ProviderAweber extends OauthHandler
         }
 
         $this->client = new Client();
-
         return true;
     }
 
@@ -78,8 +77,7 @@ class ProviderAweber extends OauthHandler
     public function lists()
     {
         $accounts = $this->getCollection($this->apiUrl . 'accounts');
-        $listsUrl = $accounts[0]['lists_collection_link'];
-        $this->result = $this->getCollection($listsUrl);
+        $this->result = $this->getCollection($accounts[0]['lists_collection_link']);
     }
 
     /**
@@ -87,7 +85,7 @@ class ProviderAweber extends OauthHandler
      *
      * @param $listUrl
      * @param $emailAddress
-     * @param null $extraData {array}
+     * @param array|null $extraData
      * @return bool
      */
     public function addToList($listUrl, $emailAddress, $extraData = null)
@@ -105,13 +103,10 @@ class ProviderAweber extends OauthHandler
             return false;
         }
 
-        $subscriberUrl = $body->getHeader('Location')[0];
-        $subscriberResponse = $this->client->get($subscriberUrl,
+        $subscriberResponse = $this->client->get($body->getHeader('Location')[0],
             ['headers' => ['Authorization' => 'Bearer ' . $this->accessToken]])->getBody();
 
-        $subscriber = json_decode($subscriberResponse, true);
-        $this->result = $subscriber;
-
+        $this->result = json_decode($subscriberResponse, true);
         return true;
     }
 
@@ -135,8 +130,7 @@ class ProviderAweber extends OauthHandler
                 return false;
             }
 
-            $body = $request->getBody();
-            $page = json_decode($body, true);
+            $page = json_decode($request->getBody(), true);
 
             if ($request->getStatusCode() != 200) {
                 $collection = array_merge($page['error'], $collection);
