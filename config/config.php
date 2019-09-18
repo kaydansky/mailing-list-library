@@ -14,3 +14,8 @@ define('AWEBER_REDIRECT_URI', 'https://ruscoder.com/MailingListLibrary/examples/
 define('CONSTANTCONTACT_API_KEY', 'unkamhbrdu972skut8utuws5');
 define('CONSTANTCONTACT_CLIENT_SECRET', 'HWNkE9pzrjPdUPQNezGv7PTd');
 define('CONSTANTCONTACT_REDIRECT_URI', 'https://ruscoder.com/MailingListLibrary/examples/constantcontact/constantcontact.php');
+
+// Infusionsoft
+define('INFUSIONSOFT_CLIENT_ID', 'sxpftwfa6etgm8gvvpvq8sj7');
+define('INFUSIONSOFT_CLIENT_SECRET', 'YyAWAZc7ng');
+define('INFUSIONSOFT_REDIRECT_URI', 'https://ruscoder.com/MailingListLibrary/examples/infusionsoft/infusionsoft.php');

@@ -1,8 +1,8 @@
 <?php
 /**
  * @author: AlexK
- * Date: 29-Aug-19
- * Time: 9:51 PM
+ * Date: 18-Sep-19
+ * Time: 2:54 PM
  */
 
 namespace MailingListLibrary\Providers;
@@ -10,39 +10,43 @@ namespace MailingListLibrary\Providers;
 use GuzzleHttp\{Client, Exception\ClientException};
 use MailingListLibrary\OauthHandler;
 
-class ProviderConstantContact extends OauthHandler
+class ProviderInfusionsoft extends OauthHandler
 {
-    private $oauthUrl = 'https://oauth2.constantcontact.com/oauth2/';
-    private $baseUrl = 'https://api.constantcontact.com/v2/';
+    private $oauthUrl = 'https://signin.infusionsoft.com/app/oauth/authorize';
+    private $tokenUrl = 'https://api.infusionsoft.com/token';
+    private $baseUrl = 'https://api.infusionsoft.com/crm/rest/v1/';
     private $client;
 
     public $accessToken;
+    public $refreshToken;
     public $expiresToken;
     public $alreadyExpired;
     public $error;
     public $result;
 
     /**
-     * ProviderConstantContact constructor.
+     * ProviderInfusionsoft constructor.
      *
      * @param string $accessToken
+     * @param string $refreshToken
      * @param string $expiresToken
      */
-    public function __construct($accessToken = '', $expiresToken = '')
+    public function __construct($accessToken = '', $refreshToken = '', $expiresToken = '')
     {
-        if (! defined('CONSTANTCONTACT_API_KEY') || ! defined('CONSTANTCONTACT_CLIENT_SECRET') || ! defined('CONSTANTCONTACT_REDIRECT_URI')) {
+        if (! defined('INFUSIONSOFT_CLIENT_ID') || ! defined('INFUSIONSOFT_CLIENT_SECRET') || ! defined('INFUSIONSOFT_REDIRECT_URI')) {
             $this->error = 'No Client ID nor Client Secret nor Redirect URI supplied. Make sure the config file path is correct.';
             return false;
         }
 
         $this->accessToken = $accessToken;
+        $this->refreshToken = $refreshToken;
         $this->expiresToken = $expiresToken;
 
-        $this->clientId = CONSTANTCONTACT_API_KEY;
-        $this->clientSecret = CONSTANTCONTACT_CLIENT_SECRET;
-        $this->redirectUri = CONSTANTCONTACT_REDIRECT_URI;
-        $this->urlAuthorize = $this->oauthUrl . 'oauth/siteowner/authorize';
-        $this->urlAccessToken = $this->oauthUrl . 'oauth/token';
+        $this->clientId = INFUSIONSOFT_CLIENT_ID;
+        $this->clientSecret = INFUSIONSOFT_CLIENT_SECRET;
+        $this->redirectUri = INFUSIONSOFT_REDIRECT_URI;
+        $this->urlAuthorize = $this->oauthUrl;
+        $this->urlAccessToken = $this->tokenUrl;
         parent::__construct();
 
         if ($this->error) {
@@ -54,17 +58,19 @@ class ProviderConstantContact extends OauthHandler
     }
 
     /**
-     * Fetch mailing lists
+     * Fetch contacts
+     *
+     * @return bool
      */
-    public function lists()
+    public function contacts()
     {
         try {
-            $request = $this->client->get($this->baseUrl . 'lists?api_key=' . CONSTANTCONTACT_API_KEY,
+            $request = $this->client->get($this->baseUrl . 'contacts',
                 ['headers' => ['Authorization' => 'Bearer ' . $this->accessToken]]
             );
         } catch (ClientException $e) {
             $msg = json_decode($e->getResponse()->getBody()->getContents());
-            $this->error = $msg[0]->error_message;
+            $this->error = $msg->message;
             return false;
         }
 
@@ -73,25 +79,27 @@ class ProviderConstantContact extends OauthHandler
     }
 
     /**
-     * Add new subscriber to mailing list
+     * Create new contact
      *
-     * @param $listId
-     * @param $emailAddress
+     * @param $email
      * @param array|null $extraData
      * @return bool
      */
-    public function addToList($listId, $emailAddress, array $extraData = null)
+    public function addContact($email, array $extraData = null)
     {
-        $data = array_merge(['email_addresses' => [['email_address' => $emailAddress]], 'lists' => [['id' => $listId]]], $extraData);
+        $email1 = new \stdClass;
+        $email1->field = 'EMAIL1';
+        $email1->email = $email;
+        $data = array_merge(['email_addresses' => [$email1]], $extraData);
 
         try {
-            $request = $this->client->post($this->baseUrl . 'contacts?api_key=' . CONSTANTCONTACT_API_KEY, [
+            $request = $this->client->post($this->baseUrl . 'contacts', [
                 'json' => $data,
                 'headers' => ['Authorization' => 'Bearer ' . $this->accessToken]
             ]);
         } catch (ClientException $e) {
             $msg = json_decode($e->getResponse()->getBody()->getContents());
-            $this->error = $msg[0]->error_message;
+            $this->error = $msg->message;
             return false;
         }
 

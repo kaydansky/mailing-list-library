@@ -1,5 +1,7 @@
 <?php
 /**
+ * ConstantContact API wrapper library example of use
+ *
  * @author: AlexK
  * Date: 30-Aug-19
  * Time: 9:48 PM
