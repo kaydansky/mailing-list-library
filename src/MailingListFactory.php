@@ -70,6 +70,7 @@ class MailingListFactory
      * Make Infusionsoft API wrapper instance
      *
      * @param $OAuthAccessToken
+     * @param $OAuthRefreshToken
      * @param $OAuthExpiresToken
      * @return ProviderInfusionsoft
      */

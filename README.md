@@ -113,7 +113,107 @@ email addresses along with additional contact information. Therefore new methods
 
 ```contacts()``` instead ```lists()``` and ```addContact()``` instead ```addToList()```
 
-#### Optional data
+### API methods summary
+
+```$factory = new MailingListFactory();``` the factory object.
+
+MailChimp:
+
+```php
+/**
+ * MailChimp object
+ * @param string $apiKey
+ */
+$mailChimp = $factory->mailChimp($apiKey);
+
+/**
+ * Fetch mailing lists
+ */
+$mailChimp->lists();
+
+/**
+ * Add new subscriber to mailing list
+ * @param string|int $listId
+ * @param string $emailAddress
+ * @param array|null $extraData optional
+ */
+$mailChimp->addToList($listId, $emailAddress, $extraData);
+```
+
+AWeber:
+
+```php
+/**
+ * AWeber object
+ * @param string|null $OAuthAccessToken optional
+ * @param string|null $OAuthRefreshToken optional
+ * @param string|null $OAuthExpiresToken optional
+ */
+$aweber = $factory->aweber($OAuthAccessToken, $OAuthRefreshToken, $OAuthExpiresToken);
+
+/**
+ * Fetch mailing lists
+ */
+$aweber->lists();
+
+/**
+ * Add new subscriber to mailing list
+ * @param string $listUrl
+ * @param string $emailAddress
+ * @param array|null $extraData optional
+ */
+$aweber->addToList($listUrl, $emailAddress, $extraData);
+```
+
+ConstantContact:
+
+```php
+/**
+ * ConstantContact object
+ * @param string|null $OAuthAccessToken optional
+ * @param string|null $OAuthExpiresToken optional
+ */
+$constantContact = $factory->constantContact($OAuthAccessToken, $OAuthExpiresToken);
+
+/**
+ * Fetch mailing lists
+ */
+$constantContact->lists();
+
+/**
+ * Add new subscriber to mailing list
+ * @param string|int $listId
+ * @param string $emailAddress
+ * @param array|null $extraData optional
+ */
+$constantContact->addToList($listId, $emailAddress, $extraData);
+```
+
+Infusionsoft:
+
+```php
+/**
+ * Infusionsoft object
+ * @param string|null $OAuthAccessToken optional
+ * @param string|null $OAuthRefreshToken optional
+ * @param string|null $OAuthExpiresToken optional
+ */
+$infusionsoft = $factory->infusionsoft($OAuthAccessToken, $OAuthRefreshToken, $OAuthExpiresToken);
+
+/**
+ * Fetch contacts
+ */
+$infusionsoft->contacts();
+
+/**
+ * Create new contact
+ * @param string $email
+ * @param array|null $extraData optional
+ */
+$infusionsoft->addContact($email, $extraData);
+```
+
+### Optional data
 
 The ```$extraData``` argument is an array with optional data (fields) to supply along with new subscriber email 
 address. Every provider has their own field names. In order to comply, your array's key names must correspond to 
