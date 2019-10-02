@@ -91,7 +91,7 @@
                             <input type="text" class="form-control" id="lname" placeholder="Last Name">
                         </div>
                         <div class="col-2">
-                            <button class="subscribe btn btn-info" api-key="" base-url="">Add Contact</button>
+                            <button class="subscribe btn btn-info">Add Contact</button>
                         </div>
                     </div>
 
@@ -118,10 +118,6 @@
     const apiKey = $('#apiKey').val();
     const baseUrl = $('#baseUrl').val();
 
-    $(document).on('ready', function() {
-        addToList();
-    });
-
     $('#apiKeyForm').on('submit', function (f) {
         f.preventDefault();
         fetchLists();
@@ -145,7 +141,7 @@
         }
     }
 
-    function fetchLists(fireSingle = 0) {
+    function fetchLists() {
         $('.container-loader').show();
         $('#listsTable').find("tr:gt(0)").remove();
 
@@ -167,42 +163,35 @@
                 ).appendTo('#listsTable');
             });
 
-            if (! fireSingle) {
-                addToList();
-            }
-
             deleteTrigger();
-
             return true;
         });
     }
 
-    function addToList() {
-        $('.subscribe').on('click', function() {
-            const email = $('#email').val();
-            const fname = $('#fname').val();
-            const lname = $('#lname').val();
+    $('.subscribe').on('click', function() {
+        const email = $('#email').val();
+        const fname = $('#fname').val();
+        const lname = $('#lname').val();
 
-            $('.container-loader').show();
+        $('.container-loader').show();
 
-            $.post('activecampaign.php',
-                {
-                    api_key: apiKey,
-                    base_url: baseUrl,
-                    email_address: email,
-                    first_name: fname,
-                    last_name: lname,
-                }).done(function(data) {
-                    if (parseResponse(data)) {
-                        $('#email').val('');
-                        $('#fname').val('');
-                        $('#lname').val('');
-                        fetchLists(1);
-                        return true;
-                    }
-                });
-        });
-    }
+        $.post('activecampaign.php',
+            {
+                api_key: apiKey,
+                base_url: baseUrl,
+                email_address: email,
+                first_name: fname,
+                last_name: lname,
+            }).done(function(data) {
+                if (parseResponse(data)) {
+                    $('#email').val('');
+                    $('#fname').val('');
+                    $('#lname').val('');
+                    fetchLists(1);
+                    return true;
+                }
+            });
+    });
 
     function deleteTrigger() {
         $('.delete').on('click', function () {
