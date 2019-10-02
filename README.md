@@ -2,6 +2,14 @@
 
 Wrapper bundling a number of mailing list providers APIs, in PHP
 
+Providers currently implemented:
+
+* ActiveCampaign
+* AWeber
+* ConstantContact
+* Infusionsoft
+* MailChimp
+
 ## Requirements
 
 * PHP 7.3.0 - 7.3.8
@@ -213,6 +221,35 @@ $infusionsoft->contacts();
 $infusionsoft->addContact($email, $extraData);
 ```
 
+ActiveCampaign:
+
+```php
+/**
+ * ActiveCampaign object
+ * @param string $apiKey
+ * @param string $baseUrl
+ */
+$activeCampaign = $factory->activeCampaign($apiKey, $baseUrl);
+
+/**
+ * Fetch contacts
+ */
+$activeCampaign->contacts();
+
+/**
+ * Create new contact
+ * @param string $email
+ * @param array|null $extraData optional
+ */
+$activeCampaign->addContact($email, $extraData);
+
+/**
+ * Delete contact
+ * @param int $contactId
+ */
+$activeCampaign->deleteContact($contactId);
+```
+
 ### Optional data
 
 The ```$extraData``` argument is an array with optional data (fields) to supply along with new subscriber email 
@@ -225,13 +262,17 @@ are allowed to create their custom fields. [Learn more](https://mailchimp.com/he
 **AWeber** default optional fields are: ad_tracking, custom_fields, ip_address, last_followup_message_number_sent, 
 misc_notes, name, tags. [Learn more](https://api.aweber.com/#tag/Subscribers/paths/~1accounts~1{accountId}~1lists~1{listId}~1subscribers/post).
 
-**ConstantContact** has a lot of optional fields: 
+**ConstantContact** has a lot of optional fields. 
 [Learn more](https://developer.constantcontact.com/docs/contacts-api/contacts-collection.html?method=POST). 
 For the subscriber name use: ```['first_name' => 'value', 'last_name' => 'value']```.
 
-**Infusionsoft** has a lot of optional fields (some of them are of the object type):
+**Infusionsoft** has a lot of optional fields (some of them are of the object type).
 [Learn more](https://developer.infusionsoft.com/docs/rest/#!/Contact/createContactUsingPOST).
-For the subscriber name use: ```['given_name' => 'value', 'family_name' => 'value']```. 
+For the subscriber name use: ```['given_name' => 'value', 'family_name' => 'value']```.
+
+**ActiveCampaign** optional fields are: firstName, lastName, phone.
+[Learn more](https://developers.activecampaign.com/reference#create-contact).
+For the subscriber name use: ```['firstName' => 'value', 'lastName' => 'value']```.  
 
 ## Examples
 
@@ -247,3 +288,5 @@ AWeber: [https://ruscoder.com/MailingListLibrary/examples/aweber/aweber.html](ht
 ConstantContact: [https://ruscoder.com/MailingListLibrary/examples/constantcontact/constantcontact.html](https://ruscoder.com/MailingListLibrary/examples/constantcontact/constantcontact.html)
 
 Infusionsoft: [https://ruscoder.com/MailingListLibrary/examples/infusionsoft/infusionsoft.html](https://ruscoder.com/MailingListLibrary/examples/infusionsoft/infusionsoft.html)
+
+ActiveCampaign: [https://ruscoder.com/MailingListLibrary/examples/activecampaign/activecampaign.html](https://ruscoder.com/MailingListLibrary/examples/activecampaign/activecampaign.html)

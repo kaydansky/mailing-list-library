@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ActiveCampaign Example</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <style>
+        .container-loader {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            padding: 10px;
+            background-color: rgba(0, 0, 0, 0.3);
+            z-index: 1060;
+        }
+        .loader {
+            border: 4px solid #d2d2d2;
+            border-top: 4px solid #283a93;
+            border-radius: 50%;
+            position: fixed;
+            top: 50%;
+            right: 50%;
+            margin-right: -40px;
+            margin-top: -40px;
+            border-radius: 50%;
+            z-index: 1061;
+            width: 40px;
+            height: 40px;
+            animation: spin 2s linear infinite;
+        }
+
+        @-moz-keyframes spin {
+            from { -moz-transform: rotate(0deg); }
+            to { -moz-transform: rotate(360deg); }
+        }
+
+        @-webkit-keyframes spin {
+            from { -webkit-transform: rotate(0deg); }
+            to { -webkit-transform: rotate(360deg); }
+        }
+
+        @keyframes spin {
+            from {transform:rotate(0deg);}
+            to {transform:rotate(360deg);}
+        }
+    </style>
+</head>
+<body>
+<div class="container mb-5 mt-4">
+    <div class="row justify-content-center">
+        <div class="col-12">
+            <div class="card">
+                <h5 class="card-header">ActiveCampaign API Wrapper Example</h5>
+                <div class="card-body">
+                    <p class="text-center mb-5">
+                        Use ActiveCampaign's API Key and BaseURL.
+                        <a href="https://developers.activecampaign.com/v3/reference#url" target="_blank">Learn more</a>.
+                    </p>
+                    <form action="" id="apiKeyForm" class="mb-4">
+                        <div class="row form-group">
+                            <div class="col">
+                                <label for="apiKey" class="mr-2">API Key</label>
+                                <input type="text" id="apiKey" placeholder="API Key" value="0c288cb5d66a05685bee63b7d2200e651d4a55bc1fe98d8bc5374b9f1c08b3737be6413d" class="form-control">
+                            </div>
+                            <div class="col">
+                                <label for="baseUrl" class="mr-2">Base URL</label>
+                                <input type="text" id="baseUrl" placeholder="Base URL" value="https://rapidcrushinc1569941794.api-us1.com" class="form-control">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12 text-center"><button id="" class="btn btn-primary">Fetch Contacts</button></div>
+                        </div>
+                    </form>
+                    <p id="errorAlert" class="text-center"></p>
+                    <p id="successAlert" class="text-center"></p>
+                    <hr>
+                    <div class="row mb-3 justify-content-center">
+                        <div class="col-2 pr-0">
+                            <input type="text" class="form-control" id="email" placeholder="Email Address">
+                        </div>
+                        <div class="col-2 pr-0">
+                            <input type="text" class="form-control" id="fname" placeholder="First Name">
+                        </div>
+                        <div class="col-2 pr-0">
+                            <input type="text" class="form-control" id="lname" placeholder="Last Name">
+                        </div>
+                        <div class="col-2">
+                            <button class="subscribe btn btn-info" api-key="" base-url="">Add Contact</button>
+                        </div>
+                    </div>
+
+                    <table id="listsTable" class="table d-none">
+                        <thead>
+                        <th class="text-nowrap">ID</th>
+                        <th class="text-nowrap">Name</th>
+                        <th class="text-nowrap">Email</th>
+                        <th></th>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container-loader">
+    <div class="loader"></div>
+</div>
+</body>
+<script>
+    const apiKey = $('#apiKey').val();
+    const baseUrl = $('#baseUrl').val();
+
+    $(document).on('ready', function() {
+        addToList();
+    });
+
+    $('#apiKeyForm').on('submit', function (f) {
+        f.preventDefault();
+        fetchLists();
+    });
+
+    function parseResponse(data) {
+        $('.container-loader').hide();
+        $('#errorAlert').html('');
+        $('#successAlert').html('');
+        const response = $.parseJSON(data);
+
+        if (response.error) {
+            $('#errorAlert').html('<div class="alert alert-danger" role="alert">ERROR: ' + response.error + '</div>');
+            return false;
+        } else {
+            if (response.success) {
+                $('#successAlert').html('<div class="alert alert-success" role="alert">SUCCESS: ' + response.success + '</div>');
+            }
+
+            return response.result;
+        }
+    }
+
+    function fetchLists(fireSingle = 0) {
+        $('.container-loader').show();
+        $('#listsTable').find("tr:gt(0)").remove();
+
+        $.post('activecampaign.php', { api_key: apiKey, base_url: baseUrl, fetch_lists: 1 }).done(function(data) {
+            const response = parseResponse(data);
+
+            if (! response) {
+                return false;
+            }
+
+            $('#listsTable').removeClass('d-none');
+
+            $.each(response, function(i, item) {
+                $('<tr>').append(
+                    $('<td>').text(item.id),
+                    $('<td>').text(item.name),
+                    $('<td>').text(item.email),
+                    $('<td>').html('<a id="' + item.id + '" class="delete" title="Delete" href="#"><i class="far fa-trash-alt mr-3"></i></a>')
+                ).appendTo('#listsTable');
+            });
+
+            if (! fireSingle) {
+                addToList();
+            }
+
+            deleteTrigger();
+
+            return true;
+        });
+    }
+
+    function addToList() {
+        $('.subscribe').on('click', function() {
+            const email = $('#email').val();
+            const fname = $('#fname').val();
+            const lname = $('#lname').val();
+
+            $('.container-loader').show();
+
+            $.post('activecampaign.php',
+                {
+                    api_key: apiKey,
+                    base_url: baseUrl,
+                    email_address: email,
+                    first_name: fname,
+                    last_name: lname,
+                }).done(function(data) {
+                    if (parseResponse(data)) {
+                        $('#email').val('');
+                        $('#fname').val('');
+                        $('#lname').val('');
+                        fetchLists(1);
+                        return true;
+                    }
+                });
+        });
+    }
+
+    function deleteTrigger() {
+        $('.delete').on('click', function () {
+            if (confirm('Delete contact. Continue?')) {
+                $.post('activecampaign.php',
+                    {
+                        api_key: apiKey,
+                        base_url: baseUrl,
+                        delete_contact_id: $(this).attr('id'),
+                    }).done(function (data) {
+                        fetchLists();
+                    });
+            } else {
+                return false;
+            }
+        });
+    }
+</script>
+</html>

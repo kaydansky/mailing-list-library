@@ -10,7 +10,9 @@
 namespace MailingListLibrary;
 
 use Exception;
-use MailingListLibrary\{Providers\ProviderAweber,
+use MailingListLibrary\{
+    Providers\ProviderActiveCampaign,
+    Providers\ProviderAweber,
     Providers\ProviderInfusionsoft,
     Providers\ProviderMailChimp,
     Providers\ProviderConstantContact};
@@ -77,5 +79,17 @@ class MailingListFactory
     public function infusionsoft($OAuthAccessToken, $OAuthRefreshToken, $OAuthExpiresToken): ProviderInfusionsoft
     {
         return new ProviderInfusionsoft($OAuthAccessToken, $OAuthRefreshToken, $OAuthExpiresToken);
+    }
+
+    /**
+     * Make ActiveCampaign API wrapper instance
+     *
+     * @param $apiKey
+     * @param $baseUrl
+     * @return ProviderActiveCampaign
+     */
+    public function activeCampaign($apiKey, $baseUrl): ProviderActiveCampaign
+    {
+        return new ProviderActiveCampaign($apiKey, $baseUrl);
     }
 }
