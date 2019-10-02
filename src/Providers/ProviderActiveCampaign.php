@@ -86,7 +86,7 @@ class ProviderActiveCampaign
     public function deleteContact($contactId)
     {
         try {
-            $request = $this->client->delete($this->baseUrl . '/api/3/contacts/' . $contactId, [
+                $this->client->delete($this->baseUrl . '/api/3/contacts/' . $contactId, [
                 'headers' => ['Api-Token' => $this->apiKey]
             ]);
         } catch (ClientException $e) {
