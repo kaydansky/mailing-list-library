@@ -1,5 +1,5 @@
 {
-  "name": "MailingListLibrary",
+  "name": "kaydansky/mailing-list-library",
   "type": "library",
   "description": "Wrapper bundling a number of mailing list providers APIs, in PHP",
   "minimum-stability": "stable",
