@@ -19,8 +19,8 @@ Providers currently implemented:
 ## Installation
 
 * Extract the archive content into directory on your server
+* Run ```composer install```
 * Add Composer autoloader (most likely you have it already) to your application with this line: ```require("vendor/autoload.php");```
-* Include MailingListFactory.php (e.g ```use MailingListLibrary\MailingListFactory;```)
 
 ## Usage
 
